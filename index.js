@@ -1,60 +1,51 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 const app = express();
-
-//Copy of Db
-const members = [
-  // 2!=2
-  {
-    id: 1,
-    name: "Shradha",
-    email: "shraha@kapoor.com",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Akshay",
-    email: "akshay@kumar.com",
-    status: "inactive",
-  },
-];
 
 app.use(cors());
 app.use(express.json()); //Data comes from body
 
-//Routes
-// app.get("/test", (req, res) => {
-//   res.send("<h1>Hello</h1>");
-// });
+//Middleware custom or ready made
 
-// get api to fetch all the user
-app.get("/allUser", (req, res) => {
-  res.status(200).json(members);
+const middleware = (req, res, next) => {
+  console.log("Hello From Middleware");
+  next();
+};
+
+app.use(middleware);
+//End Points
+app.get("/komal", (req, res) => {
+  console.log("Hi I'am komal pandey!!!");
 });
 
-//Read a particular record
-app.get("/users/:uid", (req, res) => {
-  const id = req.params.uid;
-  const user = members.filter((member) => member.id == id);
-  if (user.length == 0) {
-    res.status(400).json({ msg: "User Not Found" });
-  } else {
-    res.status(200).json({ user: user[0] });
-  }
+app.post("/malvika", (req, res) => {
+  console.log("Hi I'am Malvika Singh!!!");
+});
+app.put("/neha", (req, res) => {
+  console.log("Hi I'am neha dhiman!!!");
+});
+app.delete("/nilakshi", (req, res) => {
+  console.log("Hi I'am Nilakshi Shree!!!");
 });
 
-//Create a Record
-app.post("/user", (req, res) => {
-  const user = req.body;
-  members.push(user);
-  return res.status(200).json({ msg: "User Added", allUser: members });
-});
+//DB Call
+async function DBConnect() {
+  await mongoose.connect(
+    "mongodb+srv://harshpal830:1234567890@cluster0.qmaeckr.mongodb.net/crudApp"
+  );
+  console.log("DB Connected");
 
-app.delete("/user/:id", (req, res) => {
-  const id = req.params.id;
-  const remainingUser = members.filter((member) => member.id != id);
-  return res.status(200).json({ users: remainingUser });
-});
+  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
+}
+console.log("A");
+DBConnect();
+console.log("B");
+//Middleware
+//DB Call
+
+//End Point or Routes
+app.use("/user", require("./controllers/routes"));
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
